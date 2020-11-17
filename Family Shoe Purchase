@@ -1,0 +1,48 @@
+--QUESTIONS TO BE ANSWERED: 
+--1.) Identify which family members used which card 'ending-in' to pay for their item, using a JOIN.
+--2.) What is the average, minimum, and max amount spent on shoes for the family? Show using an aggregate function
+--3.) Which family members chose which shoe that cost greater than > $30? Show using a subquery
+/*Family Table with family_ID, first_name,last_name, height*/
+create table FamilyTable (Family_ID integer, First_Name varchar (100), Last_Name varchar (100), Height_ft integer, Height_in integer)
+insert into FamilyTable values (1, 'Eric', 'Elizondo', 5, 10);
+insert into FamilyTable values (2, 'Liz', 'Elizondo', 5, 2 );
+insert into FamilyTable values (3, 'Eric_E', 'Elizondo', 4, 2);
+insert into FamilyTable values (4, 'Eyan', 'Elizondo', 3, 6);
+insert into FamilyTable values (5, 'Cooper', 'Dog', 1, 6);
+insert into FamilyTable values (6, 'Sheldon', 'Turtle', Null, 3);
+SELECT * from FamilyTable 
+/*Customer Table with columns customer_id , first_name,last_name*/
+create table ShoePurchase (Family_ID integer, Shoe_Type varchar (100), HeelHeight_In integer, Payment_Amount integer, Card_Ending integer);
+insert into ShoePurchase values (1, 'Loafer', 1, 60, 1234);
+insert into ShoePurchase values (2, 'Pump', 3, 40, 5678);
+insert into ShoePurchase values (3, 'Sneaker', 1.5, 30, 6211);
+insert into ShoePurchase values (4, 'Sandal', .5, 20, 7234);
+insert into ShoePurchase values (5, Null, Null);
+insert into ShoePurchase values (6, Null , Null);
+select * from ShoePurchase
+/*Payment Table with payment_type,payment_amount, card_ending*/
+create table PaymentTable (Payment_Type varchar (100), Payment_Amount integer, Card_Ending integer)
+insert into PaymentTable values ('Card', 60, 1234);
+insert into PaymentTable values ('Card', 40, 5678);
+insert into PaymentTable values ('GiftCard', 30, 6211);
+insert into PaymentTable values ('GiftCard', 20, 7234);
+insert into PaymentTable values (Null ,Null ,Null);
+insert into PaymentTable values (Null ,Null ,Null );
+select * from PaymentTable
+--Join Tables 
+--Question 1: Identify which family members used which card 'ending-in' to pay for their item, using a JOIN.
+select ShoePurchase.Family_ID, FamilyTable.First_name, FamilyTable.Last_name, PaymentTable.Card_Ending
+from ShoePurchase
+inner join FamilyTable on FamilyTable.Family_ID = ShoePurchase.Family_ID
+inner join PaymentTable on PaymentTable.Card_Ending = ShoePurchase.Card_Ending
+--Question 2: What is the average, minimum, and max amount spent on shoes for the family? Show using an aggregate function
+SELECT AVG(Payment_Amount)as AVG_PAID, MIN (Payment_Amount) as MIN_PAID, MAX (Payment_Amount) as MAX_PAID
+from ShoePurchase
+where Payment_Amount is not null
+--Question 3: Which family members chose which shoe that cost greater than > $30? Show using a subquery
+select Shoe_Type
+from (select Shoe_Type from ShoePurchase where Payment_Amount > 20)
+--Ensure the same creditcard was not used more than once. Ensure no duplicates present
+select distinct Card_Ending
+from PaymentTable
+where Card_Ending is not null
